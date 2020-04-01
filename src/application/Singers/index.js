@@ -90,7 +90,7 @@ function Singers(props) {
         >
           {renderSingerList()}
         </Scroll>
-        <Loading show={enterLoading}></Loading>
+        {enterLoading ? <Loading></Loading> : null}
       </ListContainer>
     </div>
   )
