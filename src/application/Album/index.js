@@ -8,6 +8,7 @@ import style from '../../assets/global-style'
 import {connect} from 'react-redux'
 import {getAlbumList, changeEnterLoading} from './store/actionCreators'
 import Loading from "../../baseUI/loading";
+import SongsList from "../SongList";
 
 export const HEADER_HEIGHT = 45
 
@@ -35,10 +36,10 @@ function Album(props) {
       setTitle("歌单");
       setIsMarquee(false);
     }
-  }, [currentAlbum])
+  }, ['currentAlbum'])
   const handleBack = useCallback(() => {
     setShowStatus(false)
-  },[])
+  }, [])
   useEffect(() => {
     getAlbumDataDispatch(id)
   }, [getAlbumDataDispatch, id])
@@ -90,7 +91,7 @@ function Album(props) {
       </Menu>
     )
   }
-  const renderSongList = ()=>{
+  const renderSongList = () => {
     return (
       <SongList>
         <div className="first_line">
@@ -141,7 +142,12 @@ function Album(props) {
               <div>
                 {renderTopDesc()}
                 {renderMenu()}
-                {renderTopDesc()}
+                <SongsList
+                  songs={currentAlbum.tracks}
+                  collectCount={currentAlbum.subscribedCount}
+                  showCollect={true}
+                  showBackground={true}
+                ></SongsList>
               </div>
             </Scroll>
           ) : null

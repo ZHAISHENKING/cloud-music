@@ -2,6 +2,7 @@ import axios from 'axios';
 
 export const baseUrl = 'http://localhost:4000';
 
+export const HEADER_HEIGHT = 45
 //axios 的实例及拦截器配置
 const axiosInstance = axios.create({
   baseURL: baseUrl
@@ -186,3 +187,10 @@ export const alphaTypes = [{
     name: "Z"
   }
 ];
+
+// 播放模式
+export const playMode = {
+  sequence: 0,
+  loop: 1,
+  random: 2
+};
