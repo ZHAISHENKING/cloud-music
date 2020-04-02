@@ -1,6 +1,7 @@
 import React from 'react';
-import styled from'styled-components';
+import styled from 'styled-components';
 import style from '../../assets/global-style';
+import {prefixStyle} from "../../api/util";
 
 const CircleWrapper = styled.div`
   position: relative;
@@ -18,7 +19,7 @@ const CircleWrapper = styled.div`
   }
 `
 
-function Index (props) {
+function ProgressCircle(props) {
   const {radius, percent} = props;
   // 整个背景的周长
   const dashArray = Math.PI * 100;
@@ -31,11 +32,12 @@ function Index (props) {
         <circle className="progress-background" r="50" cx="50" cy="50" fill="transparent"/>
         <circle className="progress-bar" r="50" cx="50" cy="50" fill="transparent"
                 strokeDasharray={dashArray}
-                strokeDashoffset={dashOffset}/>
+                strokeDashoffset={dashOffset}
+        />
       </svg>
       {props.children}
     </CircleWrapper>
   )
 }
 
-export default React.memo (Index);
+export default React.memo(ProgressCircle);

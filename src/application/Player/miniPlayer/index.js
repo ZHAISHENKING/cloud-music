@@ -1,14 +1,14 @@
-import React,{useRef} from 'react';
+import React, {useRef} from 'react';
 import {getName} from '../../../api/util';
-import { MiniPlayerContainer } from './style';
+import {MiniPlayerContainer} from './style';
 import {CSSTransition} from "react-transition-group";
 import ProgressCircle from '../../../baseUI/progress-circle'
 
-function MiniPlayer (props) {
-  const { song, fullScreen } = props;
-  const {toggleFullScreen} = props
+function MiniPlayer(props) {
+  const {full, song, fullScreen, playing, percent} = props;
+  const {toggleFullScreen, clickPlaying, setFullScreen} = props
   const miniPlayerRef = useRef()
-  let percent = 0.2;
+
   return (
     <CSSTransition
       in={!fullScreen}
@@ -21,19 +21,25 @@ function MiniPlayer (props) {
         miniPlayerRef.current.style.display = "none";
       }}
     >
-      <MiniPlayerContainer ref={miniPlayerRef} onClick={()=>{toggleFullScreen(true)}}>
+      <MiniPlayerContainer ref={miniPlayerRef} onClick={() => {
+        toggleFullScreen(true)
+      }}>
         <div className="icon">
           <div className="imgWrapper">
-            <img className="play" src={song.al.picUrl} width="40" height="40" alt="img"/>
+            <img className={`play ${playing ? "" : "pause"}`} src={song.al.picUrl} width="40" height="40" alt="img"/>
           </div>
         </div>
         <div className="text">
           <h2 className="name">{song.name}</h2>
-          <p className="desc">{getName (song.ar)}</p>
+          <p className="desc">{getName(song.ar)}</p>
         </div>
         <div className="control">
           <ProgressCircle radius={32} percent={percent}>
-            <i className="icon-mini iconfont icon-pause">&#xe650;</i>
+            {playing ?
+              <i className="icon-mini iconfont icon-pause" onClick={e => clickPlaying(e, false)}>&#xe650;</i>
+              :
+              <i className="icon-mini iconfont icon-play" onClick={e => clickPlaying(e, true)}>&#xe61e;</i>
+            }
           </ProgressCircle>
         </div>
         <div className="control">
@@ -44,4 +50,4 @@ function MiniPlayer (props) {
   )
 }
 
-export default React.memo (MiniPlayer);
+export default React.memo(MiniPlayer);
