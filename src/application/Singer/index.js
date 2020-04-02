@@ -8,6 +8,7 @@ import {HEADER_HEIGHT} from "../../api/config";
 import {connect} from "react-redux";
 import {getSingerInfo, changeEnterLoading} from "./store/actionCreators";
 import Loading from "../../baseUI/loading";
+import MusicNote from "../../baseUI/music-note";
 
 function Singer(props) {
   const [showStatus, setShowStatus] = useState(true)
@@ -15,11 +16,16 @@ function Singer(props) {
     artist: immutableArtist,
     songs: immutableSongs,
     loading,
+    songsCount
   } = props;
+  const musicNoteRef = useRef()
+  const musicAnimation = (x, y) => {
+    musicNoteRef.current.startAnimation({x, y})
+  }
 
-  const { getSingerDataDispatch } = props;
-  const artist = immutableArtist.toJS ();
-  const songs = immutableSongs.toJS ();
+  const {getSingerDataDispatch} = props;
+  const artist = immutableArtist.toJS();
+  const songs = immutableSongs.toJS();
   const collectButton = useRef();
   const imageWrapper = useRef();
   const songScrollWrapper = useRef();
@@ -43,8 +49,8 @@ function Singer(props) {
     // 指的是滑动距离占图片高度的百分比
     const percent = Math.abs(newY / height);
     if (newY > 0) {
-      imageDOM.style ["transform"] = `scale(${1 + percent})`;
-      buttonDOM.style ["transform"] = `translate3d(0, ${newY}px, 0)`;
+      imageDOM.style["transform"] = `scale(${1 + percent})`;
+      buttonDOM.style["transform"] = `translate3d(0, ${newY}px, 0)`;
       layerDOM.style.top = `${height - OFFSET + newY}px`;
     } else if (newY >= minScrollY) {
       layerDOM.style.top = `${height - OFFSET - Math.abs(newY)}px`;
@@ -54,8 +60,8 @@ function Singer(props) {
       imageDOM.style.height = 0;
       imageDOM.style.zIndex = -1;
       // 按钮跟着移动且渐渐变透明
-      buttonDOM.style ["transform"] = `translate3d(0, ${newY}px, 0)`;
-      buttonDOM.style ["opacity"] = `${1 - percent * 2}`;
+      buttonDOM.style["transform"] = `translate3d(0, ${newY}px, 0)`;
+      buttonDOM.style["opacity"] = `${1 - percent * 2}`;
     } else if (newY < minScrollY) {
       // 往上滑动，但是超过 Header 部分
       layerDOM.style.top = `${HEADER_HEIGHT - OFFSET}px`;
@@ -73,10 +79,10 @@ function Singer(props) {
     const id = props.match.params.id
     getSingerDataDispatch(id)
     let h = imageWrapper.current.offsetHeight;
-    songScrollWrapper.current.style.top = `${h - OFFSET} px`;
+    songScrollWrapper.current.style.top = `${h - OFFSET}px`;
     initialHeight.current = h;
     // 把遮罩先放在下面，以裹住歌曲列表
-    layer.current.style.top = `${h - OFFSET} px`;
+    layer.current.style.top = `${h - OFFSET}px`;
     songScroll.current.refresh();
     //eslint-disable-next-line
   }, []);
@@ -93,7 +99,7 @@ function Singer(props) {
       unmountOnExit
       onExited={() => props.history.goBack()}
     >
-      <Container>
+      <Container play={songsCount}>
         <Header
           handleClick={setShowStatusFalse}
           title={artist.name}
@@ -112,10 +118,12 @@ function Singer(props) {
             <SongsList
               songs={songs}
               showCollect={false}
+              musicAnimation={musicAnimation}
             ></SongsList>
           </Scroll>
         </SongListWrapper>
-        {loading?(<Loading></Loading>):null}
+        {loading ? (<Loading></Loading>) : null}
+        <MusicNote ref={musicNoteRef}></MusicNote>
       </Container>
     </CSSTransition>
   );
@@ -126,6 +134,7 @@ const mapStateToProps = state => ({
   artist: state.getIn(["singerInfo", "artist"]),
   songs: state.getIn(["singerInfo", "songsOfArtist"]),
   loading: state.getIn(["singerInfo", "loading"]),
+  songsCount: state.getIn(['player', 'playList']).size
 });
 // 映射 dispatch 到 props 上
 const mapDispatchToProps = dispatch => {
@@ -137,4 +146,4 @@ const mapDispatchToProps = dispatch => {
   };
 };
 
-export default connect(mapStateToProps,mapDispatchToProps)(React.memo(Singer));
+export default connect(mapStateToProps, mapDispatchToProps)(React.memo(Singer));

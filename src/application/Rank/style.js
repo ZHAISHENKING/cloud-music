@@ -6,7 +6,7 @@ import style from '../../assets/global-style';
 export const Container = styled.div`
   position: fixed;
   top: 90px;
-  bottom: 0;
+  bottom: ${props => props.play > 0 ? "60px" : 0};
   width: 100%;
   .offical,.global {
     margin: 10px 5px;
@@ -45,7 +45,7 @@ export const ListItem = styled.li`
       width: 100%;
       height: 35px;
       border-radius: 3px;
-      background: linear-gradient (hsla (0,0%,100%,0),hsla (0,0%,43%,.4));
+      background: linear-gradient(hsla(0,0%,100%,0),hsla(0,0%,43%,.4));
     }
     img {
       width: 100%;

@@ -22,7 +22,7 @@ import {renderRoutes} from "react-router-config";
 function Singers(props) {
   const {data, dispatch} = useContext(CategoryDataContext)
   const {category, alpha} = data.toJS()
-  const {singerList, enterLoading, pullUpLoading, pullDownLoading, pageCount} = props;
+  const {singerList, enterLoading, pullUpLoading, pullDownLoading, pageCount, songsCount} = props;
   const {getHotSingerDispatch, updateDispatch, pullDownRefreshDispatch, pullUpRefreshDispatch} = props;
 
   let handleUpdateAlpha = (val) => {
@@ -85,7 +85,7 @@ function Singers(props) {
             oldVal={alpha}
           ></Horizen>
         </NavContainer>
-        <ListContainer>
+        <ListContainer play={songsCount}>
           <Scroll
             pullUp={handlePullUp}
             pullDown={handlePullDown}
@@ -108,7 +108,8 @@ const mapStateToProps = (state) => ({
   enterLoading: state.getIn(['singers', 'enterLoading']),
   pullUpLoading: state.getIn(['singers', 'pullUpLoading']),
   pullDownLoading: state.getIn(['singers', 'pullDownLoading']),
-  pageCount: state.getIn(['singers', 'pageCount'])
+  pageCount: state.getIn(['singers', 'pageCount']),
+  songsCount: state.getIn(['player', 'playList']).size
 });
 const mapDispatchToProps = (dispatch) => {
   return {

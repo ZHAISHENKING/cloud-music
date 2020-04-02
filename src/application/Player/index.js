@@ -12,24 +12,25 @@ import {
 import MiniPlayer from "./miniPlayer";
 import NormalPlayer from "./normalPlayer";
 import {getSongUrl, isEmptyObject, findIndex, shuffle} from "../../api/util";
+import Toast from "../../baseUI/Toast";
+import {playMode} from "../../api/config";
 
 function Player(props) {
-  const clickPlaying = (e, state) => {
-    e.stopPropagation();
-    togglePlayingDispatch(state);
-  };
   const audioRef = useRef()
   const [currentTime, setCurrentTime] = useState(0)
   const [duration, setDuration] = useState(0)
   //记录当前的歌曲，以便于下次重渲染时比对是否是一首歌
   const [preSong, setPreSong] = useState({});
+  const [modeText, setModeText] = useState('')
+  const toastRef = useRef()
+
   const {
     playing,
     currentSong: immutableCurrentSong,
     currentIndex,
-    playList:immutablePlayList,
+    playList: immutablePlayList,
     mode,//播放模式
-    sequencePlayList:immutableSequencePlayList,//顺序列表
+    sequencePlayList: immutableSequencePlayList,//顺序列表
     fullScreen,
   } = props;
 
@@ -41,6 +42,10 @@ function Player(props) {
     changeModeDispatch,//改变mode
     toggleFullScreenDispatch
   } = props;
+  const clickPlaying = (e, state) => {
+    e.stopPropagation();
+    togglePlayingDispatch(state);
+  };
 
   const playList = immutablePlayList.toJS();
   const sequencePlayList = immutableSequencePlayList.toJS();
@@ -52,14 +57,14 @@ function Player(props) {
   useEffect(() => {
     changeCurrentIndexDispatch(0);
   }, [])
+
   useEffect(() => {
     if (
       !playList.length ||
       currentIndex === -1 ||
       !playList[currentIndex] ||
       playList[currentIndex].id === preSong.id
-    )
-      return;
+    ) return;
     let current = playList[currentIndex];
     changeCurrentDispatch(current);//赋值currentSong
     setPreSong(current);
@@ -71,6 +76,7 @@ function Player(props) {
     setCurrentTime(0);//从头开始播放
     setDuration((current.dt / 1000) | 0);//时长
   }, [playList, currentIndex]);
+
   useEffect(() => {
     if (!currentSong) return;
     changeCurrentIndexDispatch(0);//currentIndex默认为-1，临时改成0
@@ -88,6 +94,38 @@ function Player(props) {
   useEffect(() => {
     playing ? audioRef.current.play() : audioRef.current.pause();
   }, [playing]);
+
+  // 解决音乐切换过快导致的bug
+  const songReady = useRef(true)
+  useEffect(() => {
+    if (
+      !playList.length ||
+      currentIndex === -1 ||
+      !playList[currentIndex] ||
+      playList[currentIndex].id === preSong.id ||
+      !songReady.current// 标志位为 false
+    )
+      return;
+    let current = playList[currentIndex];
+    setPreSong(current);
+    songReady.current = false; // 把标志位置为 false, 表示现在新的资源没有缓冲完成，不能切歌
+    changeCurrentDispatch(current);// 赋值 currentSong
+    audioRef.current.src = getSongUrl(current.id);
+    setTimeout(() => {
+      // 注意，play 方法返回的是一个 promise 对象
+      audioRef.current.play().then(() => {
+        songReady.current = true;
+      });
+    });
+    togglePlayingDispatch(true);// 播放状态
+    setCurrentTime(0);// 从头开始播放
+    setDuration((current.dt / 1000) | 0);// 时长
+  }, [playList, currentIndex]);
+  // 异常处理
+  const handleError = () => {
+    songReady.current = true
+    alert('播放出错')
+  }
 
   const onProgressChange = curPercent => {
     const newTime = curPercent * duration;
@@ -135,18 +173,29 @@ function Player(props) {
       changePlayListDispatch(sequencePlayList);
       let index = findIndex(currentSong, sequencePlayList);
       changeCurrentIndexDispatch(index);
+      setModeText("顺序循环")
     } else if (newMode === 1) {
       //单曲循环
       changePlayListDispatch(sequencePlayList);
+      setModeText("单曲循环")
     } else if (newMode === 2) {
       //随机播放
       let newList = shuffle(sequencePlayList);
       let index = findIndex(currentSong, newList);
       changePlayListDispatch(newList);
       changeCurrentIndexDispatch(index);
+      setModeText("随机播放")
     }
     changeModeDispatch(newMode);
+    toastRef.current.show()
   };
+  const handleEnd = () => {
+    if (mode === playMode.loop) {
+      handleLoop()
+    } else {
+      handleNext()
+    }
+  }
   return (
     <div>
       {isEmptyObject(currentSong) ? null :
@@ -179,7 +228,10 @@ function Player(props) {
       <audio
         ref={audioRef}
         onTimeUpdate={updateTime}
+        onEnded={handleEnd}
+        onError={handleError}
       ></audio>
+      <Toast text={modeText} ref={toastRef}></Toast>
     </div>
   )
 }
