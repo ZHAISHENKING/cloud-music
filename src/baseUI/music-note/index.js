@@ -1,6 +1,6 @@
 import React, {useEffect, useImperativeHandle, useRef, forwardRef} from 'react';
 import styled from 'styled-components';
-import { prefixStyle } from '../../api/util';
+import {prefixStyle} from '../../api/util';
 import style from '../../assets/global-style';
 
 const Container = styled.div`
@@ -36,14 +36,14 @@ const MusicNote = forwardRef((props, ref) => {
   }
 
   useEffect(() => {
-    for(let i = 0; i < ICON_NUMBER; i++){
+    for (let i = 0; i < ICON_NUMBER; i++) {
       let node = createNode(`<div class="iconfont">&#xe642;</div>`);
       iconsRef.current.appendChild(node);
     }
     let domArray = [].slice.call(iconsRef.current.children)
     domArray.forEach(item => {
       item.running = false;
-      item.addEventListener('transitionend', function() {
+      item.addEventListener('transitionend', function () {
         this.style['display'] = 'none';
         this.style[transform] = `translate3d(0, 0, 0)`;
         this.running = false;
@@ -56,7 +56,7 @@ const MusicNote = forwardRef((props, ref) => {
   }, []);
 
   const startAnimation = ({x, y}) => {
-    for(let i = 0; i < ICON_NUMBER; i++) {
+    for (let i = 0; i < ICON_NUMBER; i++) {
       let domArray = [].slice.call(iconsRef.current.children)
       let item = domArray[i]
       // 选择一个空闲的元素来开始动画

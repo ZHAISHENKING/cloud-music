@@ -14,6 +14,7 @@ import NormalPlayer from "./normalPlayer";
 import {getSongUrl, isEmptyObject, findIndex, shuffle} from "../../api/util";
 import Toast from "../../baseUI/Toast";
 import {playMode} from "../../api/config";
+import PlayList from "./play-list/index";
 
 function Player(props) {
   const audioRef = useRef()
@@ -36,6 +37,7 @@ function Player(props) {
 
   const {
     togglePlayingDispatch,
+    togglePlayListDispatch,
     changeCurrentIndexDispatch,
     changeCurrentDispatch,
     changePlayListDispatch,//改变playList
@@ -206,6 +208,7 @@ function Player(props) {
           toggleFullScreen={toggleFullScreenDispatch}
           clickPlaying={clickPlaying}
           percent={percent}
+          togglePlayList={togglePlayListDispatch}
         />
       }
       {isEmptyObject(currentSong) ? null :
@@ -223,6 +226,7 @@ function Player(props) {
           handleNext={handleNext}
           mode={mode}
           changeMode={changeMode}
+          togglePlayList={togglePlayListDispatch}
         />
       }
       <audio
@@ -232,6 +236,7 @@ function Player(props) {
         onError={handleError}
       ></audio>
       <Toast text={modeText} ref={toastRef}></Toast>
+      <PlayList></PlayList>
     </div>
   )
 }
