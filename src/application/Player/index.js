@@ -12,9 +12,11 @@ import {
 import MiniPlayer from "./miniPlayer";
 import NormalPlayer from "./normalPlayer";
 import {getSongUrl, isEmptyObject, findIndex, shuffle} from "../../api/util";
+import Lyric from "../../api/lyric-parser";
 import Toast from "../../baseUI/Toast";
 import {playMode} from "../../api/config";
 import PlayList from "./play-list/index";
+import {getLyricRequest} from '../../api/request'
 
 function Player(props) {
   const audioRef = useRef()
@@ -23,7 +25,10 @@ function Player(props) {
   //记录当前的歌曲，以便于下次重渲染时比对是否是一首歌
   const [preSong, setPreSong] = useState({});
   const [modeText, setModeText] = useState('')
+  const [currentPlayingLyric, setPlayingLyric] = useState("");
+  const currentLineNum = useRef(0);
   const toastRef = useRef()
+  const currentLyric = useRef()
 
   const {
     playing,
@@ -44,40 +49,27 @@ function Player(props) {
     changeModeDispatch,//改变mode
     toggleFullScreenDispatch
   } = props;
+
   const clickPlaying = (e, state) => {
     e.stopPropagation();
     togglePlayingDispatch(state);
+    if (currentLyric.current) {
+      currentLyric.current.togglePlay(currentTime * 1000);
+    }
   };
 
+  let currentSong = immutableCurrentSong.toJS();
   const playList = immutablePlayList.toJS();
   const sequencePlayList = immutableSequencePlayList.toJS();
   let percent = isNaN(currentTime / duration) ? 0 : currentTime / duration
+
   const updateTime = e => {
     setCurrentTime(e.target.currentTime)
   }
-  let currentSong = immutableCurrentSong.toJS();
+
   useEffect(() => {
     changeCurrentIndexDispatch(0);
   }, [])
-
-  useEffect(() => {
-    if (
-      !playList.length ||
-      currentIndex === -1 ||
-      !playList[currentIndex] ||
-      playList[currentIndex].id === preSong.id
-    ) return;
-    let current = playList[currentIndex];
-    changeCurrentDispatch(current);//赋值currentSong
-    setPreSong(current);
-    audioRef.current.src = getSongUrl(current.id);
-    setTimeout(() => {
-      audioRef.current.play();
-    });
-    togglePlayingDispatch(true);//播放状态
-    setCurrentTime(0);//从头开始播放
-    setDuration((current.dt / 1000) | 0);//时长
-  }, [playList, currentIndex]);
 
   useEffect(() => {
     if (!currentSong) return;
@@ -120,9 +112,41 @@ function Player(props) {
       });
     });
     togglePlayingDispatch(true);// 播放状态
+    getLyric(current.id)
     setCurrentTime(0);// 从头开始播放
     setDuration((current.dt / 1000) | 0);// 时长
   }, [playList, currentIndex]);
+
+  const handleLyric = ({lineNum, txt}) => {
+    if (!currentLyric.current) return;
+    currentLineNum.current = lineNum;
+    setPlayingLyric(txt);
+  };
+
+  const getLyric = id => {
+    let lyric = "";
+    if (currentLyric.current) {
+      currentLyric.current.stop();
+    }
+    // 避免 songReady 恒为 false 的情况
+    getLyricRequest(id)
+      .then(data => {
+        lyric = data.lrc.lyric;
+        if (!lyric) {
+          currentLyric.current = null;
+          return;
+        }
+        currentLyric.current = new Lyric(lyric, handleLyric);
+        currentLyric.current.play();
+        currentLineNum.current = 0;
+        currentLyric.current.seek(0);
+      })
+      .catch(() => {
+        songReady.current = true;
+        audioRef.current.play();
+      });
+  };
+
   // 异常处理
   const handleError = () => {
     songReady.current = true
@@ -227,6 +251,9 @@ function Player(props) {
           mode={mode}
           changeMode={changeMode}
           togglePlayList={togglePlayListDispatch}
+          currentLyric={currentLyric.current}
+          currentPlayingLyric={currentPlayingLyric}
+          currentLineNum={currentLineNum.current}
         />
       }
       <audio
