@@ -30,7 +30,7 @@ const Header = React.forwardRef((props, ref) => {
     <HeaderContainer ref={ref}>
       <i className="iconfont back" onClick={handleClick}>&#xe655;</i>
       {
-        isMarquee ? <marquee><h1>{title}</h1></marquee> : <h1>{title}</h1>
+        isMarquee ? <h1>{title}</h1> : <h1>{title}</h1>
       }
     </HeaderContainer>
   )

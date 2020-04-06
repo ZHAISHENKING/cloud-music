@@ -24,7 +24,7 @@ export default class Lyric {
     // 解析代码
     const lines = this.lrc.split('\n');
     for (let i = 0; i < lines.length; i++) {
-      const line = lines [i];// 如 "[00:01.997] 作词：薛之谦"
+      const line = lines[i];// 如 "[00:01.997] 作词：薛之谦"
       let result = timeExp.exec(line);
       if (!result) continue;
       const txt = line.replace(timeExp, '').trim();// 现在把时间戳去掉，只剩下歌词文本
@@ -85,13 +85,13 @@ export default class Lyric {
 
   //isSeek 标志位表示用户是否手动调整进度
   _playRest(isSeek = false) {
-    let line = this.lines [this.curLineIndex];
+    let line = this.lines[this.curLineIndex];
     let delay;
     if (isSeek) {
       delay = line.time - (+new Date() - this.startStamp);
     } else {
       // 拿到上一行的歌词开始时间，算间隔
-      let preTime = this.lines [this.curLineIndex - 1] ? this.lines [this.curLineIndex - 1].time : 0;
+      let preTime = this.lines[this.curLineIndex - 1] ? this.lines[this.curLineIndex - 1].time : 0;
       delay = line.time - preTime;
     }
     this.timer = setTimeout(() => {

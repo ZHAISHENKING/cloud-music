@@ -1,7 +1,6 @@
 import React from 'react';
 import styled from 'styled-components';
 import style from '../../assets/global-style';
-import {prefixStyle} from "../../api/util";
 
 const CircleWrapper = styled.div`
   position: relative;

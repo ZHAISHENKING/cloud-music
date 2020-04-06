@@ -1,4 +1,4 @@
-import React, {useContext, useEffect, useState} from "react";
+import React, {useContext, useEffect} from "react";
 import Horizen from "../../baseUI/horizen-item";
 import {categoryTypes, alphaTypes} from '../../api/config'
 import {NavContainer, List, ListContainer, ListItem} from './style'
@@ -46,7 +46,7 @@ function Singers(props) {
         {
           list.map((item, index) => {
             return (
-              <ListItem key={item.accountId+""+index} onClick={()=>enterDetail(item.id)}>
+              <ListItem key={item.accountId + "" + index} onClick={() => enterDetail(item.id)}>
                 <div className="img_wrapper">
                   <LazyLoad placeholder={<img width="100%" height="100%" src={require('./singer.png')} alt="music"/>}>
                     <img src={`${item.picUrl}?param=300x300`} width="100%" height="100%" alt="music"/>
@@ -67,7 +67,7 @@ function Singers(props) {
     if (!singerList.size) {
       getHotSingerDispatch()
     }
-  }, [])
+  })
   return (
     <div>
       <Data>

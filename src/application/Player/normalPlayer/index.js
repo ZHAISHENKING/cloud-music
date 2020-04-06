@@ -1,5 +1,5 @@
-import React, {useRef, useState, useEffect} from "react";
-import {getName, getSongUrl, formatPlayTime} from "../../../api/util";
+import React, {useRef, useEffect} from "react";
+import {getName, formatPlayTime} from "../../../api/util";
 import {
   NormalPlayerContainer,
   Top,
@@ -25,10 +25,8 @@ function NormalPlayer(props) {
     playing,
     percent,
     currentTime,
-    duration,
     togglePlayList,
     currentLineNum,
-    currentPlayingLyric,
     currentLyric
   } = props;
   const {toggleFullScreen, changeMode, clickPlaying, onProgressChange, handleNext, handlePrev} = props
@@ -196,14 +194,14 @@ function NormalPlayer(props) {
                     currentLyric
                       ? currentLyric.lines.map((item, index) => {
                         // 拿到每一行歌词的 DOM 对象，后面滚动歌词需要！
-                        lyricLineRefs.current [index] = React.createRef();
+                        lyricLineRefs.current[index] = React.createRef();
                         return (
                           <p
                             className={`text ${
                               currentLineNum === index ? "current" : ""
                             }`}
                             key={item + index}
-                            ref={lyricLineRefs.current [index]}
+                            ref={lyricLineRefs.current[index]}
                           >
                             {item.txt}
                           </p>

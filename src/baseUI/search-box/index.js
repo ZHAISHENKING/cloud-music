@@ -11,28 +11,28 @@ const SearchBoxWrapper = styled.div`
   padding: 0 6px;
   padding-right: 20px;
   height: 40px;
-  background: ${style ["theme-color"]};
+  background: ${style["theme-color"]};
   .icon-back {
     font-size: 24px;
-    color: ${style ["font-color-light"]};
+    color: ${style["font-color-light"]};
   }
   .box {
     flex: 1;
     margin: 0 5px;
     line-height: 18px;
-    background: ${style ["theme-color"]};
-    color: ${style ["highlight-background-color"]};
-    font-size: ${style ["font-size-m"]};
+    background: ${style["theme-color"]};
+    color: ${style["highlight-background-color"]};
+    font-size: ${style["font-size-m"]};
     outline: none;
     border: none;
-    border-bottom: 1px solid ${style ["border-color"]};
+    border-bottom: 1px solid ${style["border-color"]};
     &::placeholder {
-      color: ${style ["font-color-light"]};
+      color: ${style["font-color-light"]};
     }
   }
   .icon-delete {
     font-size: 16px;
-    color: ${style ["background-color"]};
+    color: ${style["background-color"]};
   }
 `
 
